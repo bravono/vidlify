@@ -1,89 +1,149 @@
-import React from "react";
-import Form from "./common/form";
-import Joi from "joi-browser";
+import React, { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { getMovie, saveMovie } from "../services/movieService";
 import { getGenres } from "../services/genreService";
 
-class MovieForm extends Form {
-  state = {
-    data: {
-      title: "",
-      genreId: "",
-      numberInStock: "",
-      dailyRentalRate: "",
-    },
-    genres: [],
-    errors: {},
-  };
+const initialData = {
+  title: "",
+  genreId: "",
+  numberInStock: "",
+  dailyRentalRate: "",
+};
 
-  schema = {
-    _id: Joi.string(),
-    title: Joi.string().required().label("Title"),
-    genreId: Joi.string().required().label("Genre"),
-    numberInStock: Joi.number()
-      .min(0)
-      .max(100)
-      .required()
-      .label("Number in Stock"),
-    dailyRentalRate: Joi.number()
-      .min(0)
-      .max(10)
-      .required()
-      .label("Daily Rental Rate"),
-  };
+const MovieForm = () => {
+  const router = useRouter();
+  const params = useParams();
+  const movieId = params?.id;
+  const [data, setData] = useState(initialData);
+  const [genres, setGenres] = useState([]);
+  const [errors, setErrors] = useState({});
 
-  async populateGenre() {
-    const { data: genres } = await getGenres();
-    this.setState({ genres });
-  }
-
-  async populateMovie() {
-    try {
-      const movieId = this.props.match.params.id;
-      if (movieId === "new") return;
-
-      const { data: movie } = await getMovie(movieId);
-      this.setState({ data: this.mapToViewModel(movie) });
-    } catch (ex) {
-      if (ex.response && ex.response.status === 404)
-        this.props.history.replace("/not-found");
-    }
-  }
-  async componentDidMount() {
-    await this.populateGenre();
-    await this.populateMovie();
-  }
-
-  mapToViewModel(movie) {
-    return {
-      _id: movie._id,
-      title: movie.title,
-      genreId: movie.genre._id,
-      numberInStock: movie.numberInStock,
-      dailyRentalRate: movie.dailyRentalRate,
+  useEffect(() => {
+    const fetchGenres = async () => {
+      const genresRes = await getGenres();
+      setGenres(genresRes.data || []);
     };
-  }
 
-  doSubmit = async () => {
-    await saveMovie(this.state.data);
+    const fetchMovie = async () => {
+      if (!movieId || movieId === "new") return;
+      try {
+        const movieRes = await getMovie(movieId);
+        const movie = movieRes.data;
+        setData({
+          _id: movie._id,
+          title: movie.title,
+          genreId: movie.genre._id,
+          numberInStock: movie.numberInStock,
+          dailyRentalRate: movie.dailyRentalRate,
+        });
+      } catch (ex) {
+        router.push("/not-found");
+      }
+    };
 
-    this.props.history.push("/movies");
+    fetchGenres();
+    fetchMovie();
+    // eslint-disable-next-line
+  }, [movieId]);
+
+  const validate = () => {
+    const errs = {};
+    if (!data.title) errs.title = "Title is required";
+    if (!data.genreId) errs.genreId = "Genre is required";
+    if (!data.numberInStock) errs.numberInStock = "Number in Stock is required";
+    if (!data.dailyRentalRate) errs.dailyRentalRate = "Rate is required";
+    return errs;
   };
 
-  render() {
-    return (
-      <div>
-        <h1>Movie Form</h1>
-        <form onSubmit={this.handleSubmit}>
-          {this.renderInput("title", "Title")}
-          {this.renderSelect("genreId", "Genre", this.state.genres)}
-          {this.renderInput("numberInStock", "Number in Stock", "number")}
-          {this.renderInput("dailyRentalRate", "Rate")}
-          {this.renderButton("Save")}
-        </form>
-      </div>
-    );
-  }
-}
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errs = validate();
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+    await saveMovie(data);
+    router.push("/movies");
+  };
+
+  return (
+    <div className="max-w-lg mx-auto mt-10 bg-white p-8 rounded shadow">
+      <h1 className="text-2xl font-bold mb-6">Movie Form</h1>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="block mb-1 font-medium">Title</label>
+          <input
+            name="title"
+            value={data.title}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+          />
+          {errors.title && (
+            <div className="text-red-500 text-sm mt-1">{errors.title}</div>
+          )}
+        </div>
+        <div>
+          <label className="block mb-1 font-medium">Genre</label>
+          <select
+            name="genreId"
+            value={data.genreId}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+          >
+            <option value="">Select Genre</option>
+            {genres.map((genre) => (
+              <option key={genre._id} value={genre._id}>
+                {genre.name}
+              </option>
+            ))}
+          </select>
+          {errors.genreId && (
+            <div className="text-red-500 text-sm mt-1">{errors.genreId}</div>
+          )}
+        </div>
+        <div>
+          <label className="block mb-1 font-medium">Number in Stock</label>
+          <input
+            name="numberInStock"
+            type="number"
+            value={data.numberInStock}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+          />
+          {errors.numberInStock && (
+            <div className="text-red-500 text-sm mt-1">
+              {errors.numberInStock}
+            </div>
+          )}
+        </div>
+        <div>
+          <label className="block mb-1 font-medium">Rate</label>
+          <input
+            name="dailyRentalRate"
+            type="number"
+            step="0.1"
+            value={data.dailyRentalRate}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+          />
+          {errors.dailyRentalRate && (
+            <div className="text-red-500 text-sm mt-1">
+              {errors.dailyRentalRate}
+            </div>
+          )}
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+        >
+          Save
+        </button>
+      </form>
+    </div>
+  );
+};
 
 export default MovieForm;

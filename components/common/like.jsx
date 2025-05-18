@@ -1,8 +1,7 @@
 import React from "react";
 
 const Like = ({ onLike, liked }) => {
-  let classes = "fa fa-heart";
-  if (!liked) classes += "-o";
+let classes = liked ? "fas fa-heart" : "far fa-heart";
   return (
     <i
       onClick={onLike}

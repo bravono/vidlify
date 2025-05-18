@@ -1,48 +1,47 @@
-import React, { Component } from "react";
+import React from "react";
 
-//columns > array
-//sortColumn > obj
-//onsort > function
+// columns: array
+// sortColumn: object
+// onSort: function
 
-class TableHeader extends Component {
-  raiseSort = (path) => {
-    const sortColumn = { ...this.props.sortColumn };
-    if (sortColumn.path === path)
-      sortColumn.order = sortColumn.order === "asc" ? "desc" : "asc";
-    else {
-      sortColumn.path = path;
-      sortColumn.order = "asc";
+const TableHeader = ({ columns, sortColumn, onSort }) => {
+  const raiseSort = (path) => {
+    const newSortColumn = { ...sortColumn };
+    if (newSortColumn.path === path) {
+      newSortColumn.order = newSortColumn.order === "asc" ? "desc" : "asc";
+    } else {
+      newSortColumn.path = path;
+      newSortColumn.order = "asc";
     }
-
-    this.props.onSort(sortColumn);
+    onSort(newSortColumn);
   };
 
-  RenderSortIcon = (column) => {
-    const { sortColumn } = this.props;
-
+  const renderSortIcon = (column) => {
     if (column.path !== sortColumn.path) return null;
-
-    if (sortColumn.order === "asc") return <i className="fa fa-sort-asc" />;
-    return <i className="fa fa-sort-desc" />;
+    if (sortColumn.order === "asc")
+      return <span className="ml-2">&#9650;</span>; // ▲
+    return <span className="ml-2">&#9660;</span>; // ▼
   };
 
-  render() {
-    return (
-      <thead>
-        <tr>
-          {this.props.columns.map((column) => (
-            <th
-              className="clickable"
-              key={column.path || column.key}
-              onClick={() => this.raiseSort(column.path)}
-            >
-              {column.label} {this.RenderSortIcon(column)}
-            </th>
-          ))}
-        </tr>
-      </thead>
-    );
-  }
-}
+  return (
+    <thead>
+      <tr>
+        {columns.map((column) => (
+          <th
+            key={column.path || column.key}
+            onClick={() => column.path && raiseSort(column.path)}
+            className={`px-4 py-2 border-b border-gray-200 text-left font-semibold bg-gray-50 select-none cursor-pointer transition-colors hover:bg-blue-50 ${
+              column.path ? "" : "cursor-default hover:bg-gray-50"
+            }`}
+            scope="col"
+          >
+            {column.label}
+            {column.path && renderSortIcon(column)}
+          </th>
+        ))}
+      </tr>
+    </thead>
+  );
+};
 
 export default TableHeader;

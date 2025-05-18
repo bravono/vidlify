@@ -16,7 +16,12 @@ const MoviesTable = ({
       path: "title",
       label: "Title",
       content: (movie) => (
-        <Link href={`/movies/${movie._id}`}>{movie.title}</Link>
+        <Link
+          href={`/movies/${movie._id}`}
+          className="text-blue-600 hover:underline font-medium"
+        >
+          {movie.title}
+        </Link>
       ),
     },
     { path: "genre.name", label: "Genre" },
@@ -30,14 +35,13 @@ const MoviesTable = ({
     },
   ];
 
-  // Only show delete button if user is present (optional)
   if (user) {
     columns.push({
       key: "delete",
       content: (movie) => (
         <button
           onClick={() => onDelete(movie)}
-          className="btn btn-danger btn-sm"
+          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors"
         >
           Delete
         </button>
@@ -46,7 +50,7 @@ const MoviesTable = ({
   }
 
   return (
-    <div>
+    <div className="overflow-x-auto rounded shadow bg-white p-4">
       <Table
         columns={columns}
         data={movies}

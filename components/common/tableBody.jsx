@@ -1,28 +1,32 @@
-import React, { Component } from 'react';
-import _ from 'lodash';
-import Like from "./like";
+import React from "react";
+import _ from "lodash";
 
-
-class TableBody extends Component {
-  renderCell = (item, column) => {
+const TableBody = ({ data, columns }) => {
+  const renderCell = (item, column) => {
     if (column.content) return column.content(item);
-    
-    return _.get(item, column.path)
-  }
+    return _.get(item, column.path);
+  };
 
-  createKey = (item, column) => {
+  const createKey = (item, column) => {
     return item._id + (column.path || column.key);
   };
-  
-  render() { 
-    const { data, columns } = this.props;
 
-    return (
-      <tbody>
-        {data.map(item => <tr key={item._id}>{columns.map(column => <td key={this.createKey(item, column)}>{this.renderCell(item, column)}</td>)}</tr>)}
-      </tbody>
-    )
-    ;
-  }
-}
+  return (
+    <tbody>
+      {data.map((item) => (
+        <tr key={item._id} className="hover:bg-gray-50 transition-colors">
+          {columns.map((column) => (
+            <td
+              key={createKey(item, column)}
+              className="px-4 py-2 border-b border-gray-200"
+            >
+              {renderCell(item, column)}
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  );
+};
+
 export default TableBody;

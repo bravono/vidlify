@@ -1,97 +1,98 @@
 "use client";
-import React, { Component } from "react";
+import React, { useState } from "react";
 import Input from "./input";
 import Joi from "joi-browser";
 import Select from "./Select";
 
-class Form extends Component {
-  state = {
-    data: {},
-    errors: {},
-  };
+const useForm = (initialData, schema, doSubmit) => {
+  const [data, setData] = useState(initialData);
+  const [errors, setErrors] = useState({});
 
-  validate = () => {
+  const validate = () => {
     const options = { abortEarly: false };
-    const { error } = Joi.validate(this.state.data, this.schema);
-
+    const { error } = Joi.validate(data, schema, options);
     if (!error) return null;
 
     const errors = {};
     for (let item of error.details) errors[item.path[0]] = item.message;
-
     return errors;
   };
 
-  validateProperty = ({ name, value }) => {
+  const validateProperty = ({ name, value }) => {
     const obj = { [name]: value };
-    const schema = { [name]: this.schema[name] };
-    const { error } = Joi.validate(obj, schema);
+    const subSchema = { [name]: schema[name] };
+    const { error } = Joi.validate(obj, subSchema);
     return error ? error.details[0].message : null;
   };
 
-  handleSubmit = (e) => {
+  const handleChange = ({ currentTarget: input }) => {
+    const newErrors = { ...errors };
+    const errorMessage = validateProperty(input);
+    if (errorMessage) newErrors[input.name] = errorMessage;
+    else delete newErrors[input.name];
+
+    const newData = { ...data };
+    newData[input.name] = input.value;
+
+    setData(newData);
+    setErrors(newErrors);
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    const errors = this.validate();
-    console.log(errors);
-    this.setState({ errors: errors || {} });
-    if (errors) return;
-
-    this.doSubmit();
+    const errs = validate();
+    setErrors(errs || {});
+    if (errs) return;
+    doSubmit(data);
   };
 
-  handleChange = ({ currentTarget: input }) => {
-    const errors = { ...this.state.errors };
-    const errorMessage = this.validateProperty(input);
-    if (errorMessage) errors[input.name] = errorMessage;
-    else delete errors[input.name];
-
-    const data = { ...this.state.data };
-    data[input.name] = input.value;
-
-    this.setState({ data, errors });
+  return {
+    data,
+    errors,
+    handleChange,
+    handleSubmit,
+    setData,
+    setErrors,
+    validate,
   };
+};
 
-  renderButton(label) {
-    return (
-      <button
-      disabled={this.validate()}
+export function renderButton(label, validate) {
+  return (
+    <button
+      disabled={validate()}
       className="bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-      >
+      type="submit"
+    >
       {label}
-      </button>
-    );
-  }
-
-  renderInput(name, label, type) {
-    const { data, errors } = this.state;
-
-    return (
-      <Input
-        type={type}
-        name={name}
-        label={label}
-        value={data[name]}
-        onChange={this.handleChange}
-        error={errors[name]}
-      />
-    );
-  }
-
-  renderSelect(name, label, options) {
-    const { data, errors } = this.state;
-
-    return (
-      <Select
-        name={name}
-        value={data[name]}
-        label={label}
-        options={options}
-        onChange={this.handleChange}
-        error={errors[name]}
-      />
-    );
-  }
+    </button>
+  );
 }
 
-export default Form;
+export function renderInput(name, label, type, data, errors, handleChange) {
+  return (
+    <Input
+      type={type}
+      name={name}
+      label={label}
+      value={data[name]}
+      onChange={handleChange}
+      error={errors[name]}
+    />
+  );
+}
+
+export function renderSelect(name, label, options, data, errors, handleChange) {
+  return (
+    <Select
+      name={name}
+      value={data[name]}
+      label={label}
+      options={options}
+      onChange={handleChange}
+      error={errors[name]}
+    />
+  );
+}
+
+export default useForm;
