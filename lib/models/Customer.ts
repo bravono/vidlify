@@ -1,5 +1,6 @@
-const Joi = require("joi");
-const mongoose = require("mongoose");
+// Correct way in Next.js/TypeScript:
+import Joi from "joi";
+import mongoose from "mongoose";
 
 export const Customer = mongoose.models.Customer || mongoose.model(
   "Customer",
@@ -23,7 +24,7 @@ export function validateCustomer(customer: ICustomer) {
     phone: Joi.string().min(11),
   };
 
-  return Joi.validate(customer, schema);
+  return Joi.object(schema).validate(customer);
 }
 
 

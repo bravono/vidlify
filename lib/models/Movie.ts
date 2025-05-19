@@ -1,6 +1,7 @@
-const Joi = require("joi");
-const mongoose = require("mongoose");
-const { genreSchema } = require("./genre");
+import Joi from "joi";
+import mongoose from "mongoose";
+import { genreSchema } from "./Genre";
+
 
 export const movieSchema = new mongoose.Schema({
   title: {
@@ -27,12 +28,13 @@ interface IMovie {
 export function validateMovie(movie: IMovie) {
   const schema = {
     title: Joi.string().min(5).max(255).required(),
-    genreId: Joi.objectId().required(),
+    genreId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
     numberInStock: Joi.number().min(0).required(),
     dailyRentalRate: Joi.number().min(0).required(),
   };
 
-  return Joi.validate(movie, schema);
+    return Joi.object(schema).validate(movie);
+  
 }
 
 

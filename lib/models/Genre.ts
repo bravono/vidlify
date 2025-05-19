@@ -15,7 +15,7 @@ export function validateGenre(genre: IGenre) {
     name: Joi.string().min(5).max(50).required(),
   };
 
-  return Joi.validate(genre, schema);
+  return Joi.object(schema).validate(genre);
 }
 
 

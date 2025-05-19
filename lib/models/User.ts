@@ -1,52 +1,55 @@
-const jwt = require("jsonwebtoken");
-const config = require("config");
-const Joi = require("joi");
-const mongoose = require("mongoose");
+import Joi from "joi";
+import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: true,
-    minlength: 5,
-    maxlength: 225,
-    trim: true,
+
+
+const userSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+      minlength: 5,
+      maxlength: 225,
+      trim: true,
+    },
+
+    lastName: {
+      type: String,
+      required: true,
+      minlength: 5,
+      maxlength: 225,
+      trim: true,
+    },
+
+    email: {
+      type: String,
+      required: true,
+      minlength: 5,
+      maxlength: 225,
+      trim: true,
+      unique: true,
+    },
+
+    phone: {
+      type: String,
+      required: true,
+      minlength: 5,
+      maxlength: 255,
+      trim: true,
+    },
+
+    password: {
+      type: String,
+      required: true,
+      minlength: 5,
+      maxlength: 1024,
+      trim: true,
+    },
+
+    isAdmin: Boolean,
   },
-
-  lastName: {
-    type: String,
-    required: true,
-    minlength: 5,
-    maxlength: 225,
-    trim: true,
-  },
-
-  email: {
-    type: String,
-    required: true,
-    minlength: 5,
-    maxlength: 225,
-    trim: true,
-    unique: true,
-  },
-
-  phone: {
-    type: String,
-    required: true,
-    minlength: 5,
-    maxlength: 255,
-    trim: true,
-  },
-
-  password: {
-    type: String,
-    required: true,
-    minlength: 5,
-    maxlength: 1024,
-    trim: true,
-  },
-
-  isAdmin: Boolean,
-}, { timestamps: true }); // Adds createdAt & updatedAt;
+  { timestamps: true }
+); // Adds createdAt & updatedAt;
 
 interface User {
   firstName: string;
@@ -57,13 +60,7 @@ interface User {
   isAdmin?: boolean;
 }
 
-userSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign(
-    { _id: this._id, isAdmin: this.isAdmin },
-    config.get("jwtPrivateKey")
-  );
-  return token;
-};
+
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 function validateUser(user: User) {
@@ -75,7 +72,7 @@ function validateUser(user: User) {
     password: Joi.string().min(5).max(225).required(),
   };
 
-  return Joi.validate(user, schema);
-}    
+  return Joi.object(schema).validate(user);
+}
 
 export { User, validateUser };
