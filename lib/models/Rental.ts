@@ -1,5 +1,5 @@
-const Joi = require("joi");
-const mongoose = require("mongoose");
+import Joi from "joi";
+import mongoose from "mongoose";
 
 const rentalSchema = new mongoose.Schema({
   customer: {
@@ -58,7 +58,8 @@ const rentalSchema = new mongoose.Schema({
     min: 0,
   },
 });
-export const Rental = mongoose.models.Rental || mongoose.model("Rental", rentalSchema);
+export const Rental =
+  mongoose.models.Rental || mongoose.model("Rental", rentalSchema);
 
 interface IRental {
   customerId: string;
@@ -67,11 +68,9 @@ interface IRental {
 
 export function validateRental(rental: IRental) {
   const schema = {
-    customerId: Joi.objectId().required(),
-    movieId: Joi.objectId().required(),
+    customerId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+    movieId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
   };
 
   return Joi.object(schema).validate(rental);
 }
-
-
