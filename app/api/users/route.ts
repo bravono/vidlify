@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import dbConnect from "../../../lib/mongodb";
-import { User, validateUser } from "../../../lib/models/User";
+import { User } from "../../../lib/models/User";
 
 export async function GET() {
   try {
@@ -8,6 +8,8 @@ export async function GET() {
     const users = await User.find();
     return NextResponse.json(users);
   } catch (error) {
+    console.log(error);
+
     return NextResponse.json(
       { error: "Failed to fetch users" },
       { status: 500 }
@@ -22,6 +24,8 @@ export async function POST(request: Request) {
     const user = await User.create(body);
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
+    console.log(error);
+
     return NextResponse.json(
       { error: "Failed to create user" },
       { status: 400 }

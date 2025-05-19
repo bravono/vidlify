@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import dbConnect from "../../../lib/mongodb";
-import { Movie, validateMovie } from "../../../lib/models/Movie";
+import { Movie } from "../../../lib/models/Movie";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     await dbConnect();
     const movies = await Movie.find();
     return NextResponse.json(movies, { status: 200 });
   } catch (error) {
+    console.log(error);
+
     return NextResponse.json(
       { error: "Error fetching movies" },
       { status: 500 }
@@ -40,6 +42,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json(movie, { status: 201 });
   } catch (error) {
+    console.log(error);
+
     return NextResponse.json(
       { error: "Failed to create movie." },
       { status: 500 }
