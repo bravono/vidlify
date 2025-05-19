@@ -1,50 +1,77 @@
 "use client";
-import React, { Component, useState } from "react";
-import { Navigate } from "react-router-dom";
+import React, { useState } from "react";
 import Joi from "joi-browser";
-import Form from "../../components/common/form";
-import auth from "../../services/authService";
+import { useRouter } from "next/navigation";
+import { renderInput, renderButton } from "../../components/common/form";
 
-class LoginForm extends Form {
-  state = {
-    data: { username: "", password: "" },
-    errors: {},
+
+const schema = {
+  username: Joi.string().required().label("Username"),
+  password: Joi.string().required().label("Password"),
+};
+
+const initialData = { username: "", password: "" };
+
+const LoginForm = () => {
+  const router = useRouter();
+  const [data, setData] = useState(initialData);
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const options = { abortEarly: false };
+    const { error } = Joi.validate(data, schema, options);
+    if (!error) return null;
+    const errs = {};
+    for (let item of error.details) errs[item.path[0]] = item.message;
+    return errs;
   };
 
-  schema = {
-    username: Joi.string().required().label("Username"),
-    password: Joi.string().required().label("Password"),
+  const handleChange = ({ target: input }) => {
+    const newData = { ...data, [input.name]: input.value };
+    setData(newData);
+
+    const errs = { ...errors };
+    const obj = { [input.name]: input.value };
+    const subSchema = { [input.name]: schema[input.name] };
+    const { error } = Joi.validate(obj, subSchema);
+    if (error) errs[input.name] = error.details[0].message;
+    else delete errs[input.name];
+    setErrors(errs);
   };
 
-  doSubmit = async () => {
-    try {
-      const { data } = this.state;
-      await auth.login(data.username, data.password);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errs = validate();
+    setErrors(errs || {});
+    if (errs) return;
 
-      const { state } = this.props.location;
-      window.location = state ? state.from.pathname : "/";
-    } catch (ex) {
-      if (ex.response && ex.response.status === 400) {
-        const errors = { ...this.state.errors };
-        errors.username = ex.response.data;
-        this.setState({ errors });
-      }
-    }
   };
 
-  render() {
-    if (auth.getCurrentUser()) return <Navigate to="/" />;
-    return (
-      <div>
-        <h1>Login</h1>
-        <form onSubmit={this.handleSubmit}>
-          {this.renderInput("username", "Username")}
-          {this.renderInput("password", "Password", "password")}
-          {this.renderButton("Login")}
-        </form>
-      </div>
-    );
-  }
-}
+
+  return (
+    <div className="max-w-md mx-auto mt-10 bg-white p-8 rounded shadow">
+      <h1 className="text-2xl font-bold mb-6">Login</h1>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {renderInput(
+          "username",
+          "Username",
+          "text",
+          data,
+          errors,
+          handleChange
+        )}
+        {renderInput(
+          "password",
+          "Password",
+          "password",
+          data,
+          errors,
+          handleChange
+        )}
+        {renderButton("Login", validate)}
+      </form>
+    </div>
+  );
+};
 
 export default LoginForm;

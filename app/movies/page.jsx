@@ -6,12 +6,12 @@ import ListGroup from "../../components/common/listGroup";
 import { paginate } from "../../utils/paginate";
 import MoviesTable from "../../components/moviesTable";
 import _ from "lodash";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import SearchBox from "../../components/common/searchBox";
 
 const Movies = ({ user }) => {
   const [movies, setMovies] = useState([]);
-  const [genres, setGenres] = useState([]);
+  const [genres, setGenres] = useState([{_id: "", name: "All Genres"}]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(4);
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,7 +27,7 @@ const Movies = ({ user }) => {
         const moviesData = await moviesRes.json();
         const genresData = await genresRes.json();
         setMovies(moviesData);
-        setGenres([{ _id: "", name: "All Genres" }, ...genresData]);
+        setGenres(prev => [...prev, ...genresData]);
       } catch (error) {
         toast.error("Failed to fetch movies or genres.");
       }
@@ -41,7 +41,6 @@ const Movies = ({ user }) => {
     setMovies(updatedMovies);
 
     try {
-      // You may want to update this to call your API endpoint
       await fetch(`/api/movies/${movie._id}`, { method: "DELETE" });
     } catch (ex) {
       toast("This movie has already been deleted.");
@@ -87,7 +86,6 @@ const Movies = ({ user }) => {
       filtered = movies.filter((m) => m.genre._id === selectedGenre._id);
 
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
-
     const paginatedMovies = paginate(sorted, currentPage, pageSize);
 
     return { totalCount: filtered.length, data: paginatedMovies };
@@ -96,8 +94,8 @@ const Movies = ({ user }) => {
   const { totalCount, data: paginatedMovies } = getPageData();
 
   return (
-    <div className="row">
-      <div className="col-3">
+    <div className="flex flex-col md:flex-row gap-8 mt-8">
+      <div className="md:w-1/4">
         <ListGroup
           items={genres}
           selectedItem={selectedGenre}
@@ -105,17 +103,16 @@ const Movies = ({ user }) => {
         />
       </div>
 
-      <div className="col">
-        {user && (
-          <Link
-            to="/movies/new"
-            className="btn btn-primary"
-            style={{ marginBottom: 20 }}
-          >
-            New Movie
-          </Link>
-        )}
-        <p>Showing {totalCount} movies in the database</p>
+      <div className="flex-1">
+        <Link
+          href="movies/new"
+          className="inline-block bg-blue-600 text-white px-4 py-2 rounded mb-5 hover:bg-blue-700 transition"
+        >
+          New Movie
+        </Link>
+        <p className="mb-3 text-gray-700">
+          Showing {totalCount} movies in the database
+        </p>
         <SearchBox value={searchQuery} onChange={handleSearch} />
         <MoviesTable
           movies={paginatedMovies}
@@ -123,6 +120,7 @@ const Movies = ({ user }) => {
           onLike={handleLike}
           onDelete={handleDelete}
           onSort={handleSort}
+          user={user}
         />
         <Pagination
           itemCount={totalCount}

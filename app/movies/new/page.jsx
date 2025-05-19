@@ -1,7 +1,6 @@
+"use client";
 import React, { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { getMovie, saveMovie } from "../services/movieService";
-import { getGenres } from "../services/genreService";
+import { useRouter } from "next/navigation";
 
 const initialData = {
   title: "",
@@ -12,39 +11,18 @@ const initialData = {
 
 const MovieForm = () => {
   const router = useRouter();
-  const params = useParams();
-  const movieId = params?.id;
   const [data, setData] = useState(initialData);
   const [genres, setGenres] = useState([]);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const fetchGenres = async () => {
-      const genresRes = await getGenres();
-      setGenres(genresRes.data || []);
+      const res = await fetch("/api/genres");
+      const genresData = await res.json();
+      setGenres(genresData);
     };
-
-    const fetchMovie = async () => {
-      if (!movieId || movieId === "new") return;
-      try {
-        const movieRes = await getMovie(movieId);
-        const movie = movieRes.data;
-        setData({
-          _id: movie._id,
-          title: movie.title,
-          genreId: movie.genre._id,
-          numberInStock: movie.numberInStock,
-          dailyRentalRate: movie.dailyRentalRate,
-        });
-      } catch (ex) {
-        router.push("/not-found");
-      }
-    };
-
     fetchGenres();
-    fetchMovie();
-    // eslint-disable-next-line
-  }, [movieId]);
+  }, []);
 
   const validate = () => {
     const errs = {};
@@ -65,7 +43,14 @@ const MovieForm = () => {
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
-    await saveMovie(data);
+
+    // POST to /api/movies
+    await fetch("/api/movies", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
     router.push("/movies");
   };
 
