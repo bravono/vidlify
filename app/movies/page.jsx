@@ -9,7 +9,7 @@ import _ from "lodash";
 import Link from "next/link";
 import SearchBox from "../../components/common/searchBox";
 
-const Movies = ({ user }) => {
+const Movies = () => {
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([{_id: "", name: "All Genres"}]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -120,7 +120,6 @@ const Movies = ({ user }) => {
           onLike={handleLike}
           onDelete={handleDelete}
           onSort={handleSort}
-          user={user}
         />
         <Pagination
           itemCount={totalCount}
