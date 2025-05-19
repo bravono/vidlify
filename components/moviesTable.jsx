@@ -18,7 +18,7 @@ const MoviesTable = ({
       content: (movie) => (
         <Link
           href={`/movies/${movie._id}`}
-          className="text-blue-600 hover:underline font-medium"
+          className="text-blue-600 hover:underline font-medium w-100 inline-block"
         >
           {movie.title}
         </Link>
@@ -30,12 +30,12 @@ const MoviesTable = ({
     {
       key: "like",
       content: (movie) => (
-        <Like liked={movie.liked} onLike={() => onLike(movie)} />
+        <Like liked={false} onLike={() => onLike(movie)} />
       ),
     },
   ];
 
-  if (user) {
+
     columns.push({
       key: "delete",
       content: (movie) => (
@@ -47,7 +47,7 @@ const MoviesTable = ({
         </button>
       ),
     });
-  }
+  
 
   return (
     <div className="overflow-x-auto rounded shadow bg-white p-4">
