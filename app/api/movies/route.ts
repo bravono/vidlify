@@ -16,16 +16,33 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  await dbConnect();
+
   try {
-    await dbConnect();
     const body = await request.json();
-    console.log("body", body)
-    const movie = await Movie.create(body);
+    const { title, genreId, numberInStock, dailyRentalRate } = body;
+
+    if (!title || !genreId || !numberInStock || !dailyRentalRate) {
+      return NextResponse.json(
+        { error: "All fields are required." },
+        { status: 400 }
+      );
+    }
+
+    const movie = new Movie({
+      title,
+      genre: genreId,
+      numberInStock,
+      dailyRentalRate,
+    });
+
+    await movie.save();
+
     return NextResponse.json(movie, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to create movie" },
-      { status: 400 }
+      { error: "Failed to create movie." },
+      { status: 500 }
     );
   }
 }
