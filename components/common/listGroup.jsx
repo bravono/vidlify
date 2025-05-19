@@ -20,7 +20,7 @@ const ListGroup = ({
                 : "bg-gray-100 hover:bg-blue-100 text-gray-800"
             }`}
         >
-          {item[textProperty]}
+          {item.name}
         </li>
       ))}
     </ul>
