@@ -8,7 +8,7 @@ export async function GET() {
     const genres = await Genre.find();
     return NextResponse.json(genres);
   } catch (error) {
-    console.log(error)
+    console.log(error);
 
     return NextResponse.json(
       { error: "Failed to fetch genres" },
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     const genre = await Genre.create(body);
     return NextResponse.json(genre, { status: 201 });
   } catch (error) {
-    console.log(error)
+    console.log(error);
 
     return NextResponse.json(
       { error: "Failed to create genre" },
