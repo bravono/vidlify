@@ -8,12 +8,12 @@ const ListGroup = ({
   onItemSelect,
 }) => {
   return (
-    <ul className="w-full">
+    <ul className="w-full items-center justify-center">
       {items.map((item, index) => (
         <li
           onClick={() => onItemSelect(item)}
           key={item[valueProperty] || index}
-          className={`cursor-pointer px-4 py-2 rounded mb-2 transition-colors
+          className={`cursor-pointer px-2 py-2 rounded mb-2 transition-colors 
             ${
               item === selectedItem
                 ? "bg-blue-600 text-white font-semibold"
