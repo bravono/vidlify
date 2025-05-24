@@ -8,10 +8,11 @@ import MoviesTable from "../../components/moviesTable";
 import _ from "lodash";
 import Link from "next/link";
 import SearchBox from "../../components/common/searchBox";
+import axios from "axios";
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
-  const [genres, setGenres] = useState([{_id: "", name: "All Genres"}]);
+  const [genres, setGenres] = useState([{ _id: "", name: "All Genres" }]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(4);
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,12 +23,11 @@ const Movies = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const moviesRes = await fetch("/api/movies");
-        const genresRes = await fetch("/api/genres");
-        const moviesData = await moviesRes.json();
-        const genresData = await genresRes.json();
-        setMovies(moviesData);
-        setGenres(prev => [...prev, ...genresData]);
+        const moviesRes = await axios.get("/api/movies");
+        const genresRes = await axios.get("/api/genres");
+
+        setMovies(moviesRes.data);
+        setGenres((prev) => [...prev, ...genresRes.data]);
       } catch (error) {
         toast.error("Failed to fetch movies or genres.");
       }
@@ -35,13 +35,18 @@ const Movies = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    console.log("genres", genres);
+    console.log("movies", movies);
+  }, [movies, genres]);
+
   const handleDelete = async (movie) => {
     const originalMovies = movies;
     const updatedMovies = originalMovies.filter((m) => m._id !== movie._id);
     setMovies(updatedMovies);
 
     try {
-      await fetch(`/api/movies/${movie._id}`, { method: "DELETE" });
+      await axios.delete(`/api/movies/${movie._id}`);
     } catch (ex) {
       toast("This movie has already been deleted.");
       setMovies(originalMovies);
@@ -94,41 +99,43 @@ const Movies = () => {
   const { totalCount, data: paginatedMovies } = getPageData();
 
   return (
-    <div className="flex flex-col md:flex-row gap-8 mt-8">
-      <div className="md:w-1/4">
-        <ListGroup
-          items={genres}
-          selectedItem={selectedGenre}
-          onItemSelect={handleGenreSelect}
-        />
-      </div>
+    <main className="w-full h-full border ">
+      <div className="flex flex-col md:flex-row gap-8 mt-10 ">
+        <div className="md:w-1/4 h-full">
+          <ListGroup
+            items={genres}
+            selectedItem={selectedGenre}
+            onItemSelect={handleGenreSelect}
+          />
+        </div>
 
-      <div className="flex-1">
-        <Link
-          href="movies/new"
-          className="inline-block bg-blue-600 text-white px-4 py-2 rounded mb-5 hover:bg-blue-700 transition"
-        >
-          New Movie
-        </Link>
-        <p className="mb-3 text-gray-700">
-          Showing {totalCount} movies in the database
-        </p>
-        <SearchBox value={searchQuery} onChange={handleSearch} />
-        <MoviesTable
-          movies={paginatedMovies}
-          sortColumn={sortColumn}
-          onLike={handleLike}
-          onDelete={handleDelete}
-          onSort={handleSort}
-        />
-        <Pagination
-          itemCount={totalCount}
-          pageSize={pageSize}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-        />
+        <div className="flex-1 w-full h-full">
+          <Link
+            href="movies/new"
+            className="inline-block bg-blue-600 text-white px-4 py-2 rounded mb-5 mt-5 hover:bg-blue-700 transition"
+          >
+            New Movie
+          </Link>
+          <p className="mb-3 text-gray-700">
+            Showing {totalCount} movies in the database
+          </p>
+          <SearchBox value={searchQuery} onChange={handleSearch} />
+          <MoviesTable
+            movies={paginatedMovies}
+            sortColumn={sortColumn}
+            onLike={handleLike}
+            onDelete={handleDelete}
+            onSort={handleSort}
+          />
+          <Pagination
+            itemCount={totalCount}
+            pageSize={pageSize}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
 
