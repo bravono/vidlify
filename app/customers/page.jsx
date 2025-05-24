@@ -3,19 +3,19 @@ import React, { useState } from "react";
 import NavBar from "@/components/navBar";
 import axios from "axios";
 
-const Rentals = () => {
-  const [rentals, setRentals] = React.useState([]);
+const Customers = () => {
+  const [customers, setCustomers] = React.useState([]);
 
   try {
-    const fetchRentals = async () => {
+    const fetchCustomers = async () => {
       const response = await axios.get("/api/customers");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      setRentals(data);
+      setCustomers(data);
     };
-    fetchRentals();
+    fetchCustomers();
   } catch (error) {
     console.error("Error fetching customers:", error);
   }
@@ -24,19 +24,18 @@ const Rentals = () => {
     <main>
       <NavBar />
       <section className="flex flex-col md:flex-row gap-8 mt-8">
-        {rentals.length
-          ? rentals.map((rental) => (
-              <div key={rental._id} className="rental-card">
-                <h2>{rental.name}</h2>
-                <p>Rental Date: {rental.dateOut}</p>
-                <p>Return Date: {rental.dateReturned}</p>
-                <p>Fee: {rental.rentalFee}</p>
+        {customers.length
+          ? customers.map((customer) => (
+              <div key={customer._id} className="customer-card">
+                <h2>{customer.name}</h2>
+                <p>Email: {customer.email}</p>
+                <p>Phone: {customer.phone}</p>
               </div>
             ))
-          : "No rental found"}
+          : "No customer found"}
       </section>
     </main>
   );
 };
 
-export default Rentals;
+export default Customers;
