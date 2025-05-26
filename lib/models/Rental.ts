@@ -1,6 +1,8 @@
 import Joi from "joi";
 import mongoose from "mongoose";
 
+const fixedTimestamp = Date.now();
+
 const rentalSchema = new mongoose.Schema({
   customer: {
     type: new mongoose.Schema({
@@ -46,18 +48,19 @@ const rentalSchema = new mongoose.Schema({
 
   dateOut: {
     type: Date,
-    default: Date.now,
+    default: fixedTimestamp,
   },
 
   dateReturned: {
     type: Date,
   },
 
-  retntalFee: {
+  rentalFee: {
     type: Number,
     min: 0,
   },
 });
+
 export const Rental =
   mongoose.models.Rental || mongoose.model("Rental", rentalSchema);
 
