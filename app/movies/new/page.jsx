@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const initialData = {
   title: "",
@@ -17,9 +18,12 @@ const MovieForm = () => {
 
   useEffect(() => {
     const fetchGenres = async () => {
-      const res = await fetch("/api/genres");
-      const genresData = await res.json();
-      setGenres(genresData);
+      try {
+        const res = await axios.get("/api/genres");
+        setGenres(res.data);
+      } catch (error) {
+        // Optionally handle error
+      }
     };
     fetchGenres();
   }, []);
@@ -44,14 +48,12 @@ const MovieForm = () => {
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    // POST to /api/movies
-    await fetch("/api/movies", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    router.push("/movies");
+    try {
+      await axios.post("/api/movies", data);
+      router.push("/movies");
+    } catch (error) {
+      console.error("Error saving movie:", error);
+    }
   };
 
   return (
@@ -74,7 +76,7 @@ const MovieForm = () => {
           <label className="block mb-1 font-medium">Genre</label>
           <select
             name="genreId"
-            value={data.genreId}
+            // value={data.genreId}
             onChange={handleChange}
             className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
           >
@@ -85,9 +87,9 @@ const MovieForm = () => {
               </option>
             ))}
           </select>
-          {errors.genreId && (
+          {/* {errors.genreId && (
             <div className="text-red-500 text-sm mt-1">{errors.genreId}</div>
-          )}
+          )} */}
         </div>
         <div>
           <label className="block mb-1 font-medium">Number in Stock</label>
