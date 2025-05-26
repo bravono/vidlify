@@ -1,4 +1,4 @@
-export default async function MoviePage({ params }: { params: { id: string } }) {
+export default async function MoviePage({ params }) {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/movies/${params.id}`,
     { cache: "no-store" }
