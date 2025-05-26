@@ -1,7 +1,3 @@
-interface MoviePageProps {
-  params: { id: string };
-}
-
 export default async function MoviePage({ params }: { params: { id: string } }) {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/movies/${params.id}`,
@@ -21,4 +17,3 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
     </div>
   );
 }
-
