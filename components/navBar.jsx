@@ -3,13 +3,13 @@ import Link from "next/link";
 
 const NavBar = ({ user = "" }) => {
   return (
-    <nav className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+    <nav className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between w-full">
       <Link href="/" className="text-xl font-bold text-blue-600">
-        Vidly
+        Vidlify
       </Link>
       <div className="flex space-x-4 items-center">
         <Link
-          href="/movies"
+          href="/"
           className="text-gray-700 hover:text-blue-600 font-medium"
         >
           Movies
