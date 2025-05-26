@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Joi from "joi-browser";
 import { useRouter } from "next/navigation";
 import { renderInput, renderButton } from "../../components/common/form";
-
+import NavBar from "../../components/navBar";
 
 const schema = {
   username: Joi.string().required().label("Username"),
@@ -44,33 +44,34 @@ const LoginForm = () => {
     const errs = validate();
     setErrors(errs || {});
     if (errs) return;
-
   };
 
-
   return (
-    <div className="max-w-md mx-auto mt-10 bg-white p-8 rounded shadow">
-      <h1 className="text-2xl font-bold mb-6">Login</h1>
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {renderInput(
-          "username",
-          "Username",
-          "text",
-          data,
-          errors,
-          handleChange
-        )}
-        {renderInput(
-          "password",
-          "Password",
-          "password",
-          data,
-          errors,
-          handleChange
-        )}
-        {renderButton("Login", validate)}
-      </form>
-    </div>
+    <main className="w-full h-full">
+      <NavBar />
+      <div className="max-w-md mx-auto mt-10 bg-white p-8 rounded shadow">
+        <h1 className="text-2xl font-bold mb-6">Login</h1>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {renderInput(
+            "username",
+            "Username",
+            "text",
+            data,
+            errors,
+            handleChange
+          )}
+          {renderInput(
+            "password",
+            "Password",
+            "password",
+            data,
+            errors,
+            handleChange
+          )}
+          {renderButton("Login", validate)}
+        </form>
+      </div>
+    </main>
   );
 };
 
