@@ -13,7 +13,6 @@ import axios from "axios";
 const Movies = () => {
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([{ _id: "", name: "All Genres" }]);
-  const [post, setPost] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(4);
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,7 +25,6 @@ const Movies = () => {
       try {
         const moviesRes = await axios.get("/api/movies");
         const genresRes = await axios.get("/api/genres");
-        const postsRes = await axios.get("https://jsonplaceholder.typicode.com/posts");
 
         setMovies(moviesRes.data);
         setGenres((prev) => {
@@ -104,7 +102,7 @@ const Movies = () => {
   const { totalCount, data: paginatedMovies } = getPageData();
 
   return (
-    <main className="w-full h-full border ">
+    <main className="w-full h-full">
       <div className="flex flex-col md:flex-row gap-8 mt-10 ">
         <div className="md:w-1/4 h-full">
           <ListGroup
@@ -132,15 +130,7 @@ const Movies = () => {
             onDelete={handleDelete}
             onSort={handleSort}
           />
-          {<ol>
-            {post.map((item) => (
-              <li key={item.id} className="mb-2">
-                <Link href={`/posts/${item.id}`} className="text-blue-600 hover:underline">
-                  {item.title}
-                </Link>
-              </li>
-            ))}
-          </ol>}
+         
           <Pagination
             itemCount={totalCount}
             pageSize={pageSize}
