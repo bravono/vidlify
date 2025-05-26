@@ -1,7 +1,10 @@
+"use client";
+
 import React from "react";
 
 const Like = ({ onLike, liked }) => {
-let classes = liked ? "fas fa-heart" : "far fa-heart";
+  let classes = "fa fa-heart";
+  if (!liked) classes += "-o";
   return (
     <i
       onClick={onLike}
