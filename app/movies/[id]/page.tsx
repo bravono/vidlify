@@ -1,13 +1,7 @@
-import axios from "axios";
-
-interface MoviePageProps {
-  params: { id: string };
-}
-
-export default async function MoviePage({ params }: MoviePageProps) {
-  // Fetch movie data from your API route
+export default async function MoviePage({ params }: { params: { id: string } }) {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/movies/${params.id}`
+    `${process.env.NEXT_PUBLIC_API_URL}/movies/${params.id}`,
+    { cache: "no-store" }
   );
   if (!res.ok) {
     return <div>Movie not found.</div>;
