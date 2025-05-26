@@ -21,7 +21,7 @@ const Rentals = () => {
   }
 
   return (
-    <main>
+    <main className="w-full h-full">
       <NavBar />
       <section className="flex flex-col md:flex-row gap-8 mt-8">
         {rentals.length
