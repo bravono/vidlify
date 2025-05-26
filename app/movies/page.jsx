@@ -13,6 +13,7 @@ import axios from "axios";
 const Movies = () => {
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([{ _id: "", name: "All Genres" }]);
+  const [post, setPost] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(4);
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,20 +26,24 @@ const Movies = () => {
       try {
         const moviesRes = await axios.get("/api/movies");
         const genresRes = await axios.get("/api/genres");
+        const postsRes = await axios.get("https://jsonplaceholder.typicode.com/posts");
 
         setMovies(moviesRes.data);
-        setGenres((prev) => [...prev, ...genresRes.data]);
+        setGenres((prev) => {
+          const allGenres = [...prev, ...genresRes.data];
+          const uniqueGenres = allGenres.filter(
+            (genre, index, self) =>
+              self.findIndex((g) => g._id === genre._id) === index
+          );
+          return uniqueGenres;
+        });
+        setPost(postsRes.data)
       } catch (error) {
         toast.error("Failed to fetch movies or genres.");
       }
     };
     fetchData();
   }, []);
-
-  useEffect(() => {
-    console.log("genres", genres);
-    console.log("movies", movies);
-  }, [movies, genres]);
 
   const handleDelete = async (movie) => {
     const originalMovies = movies;
@@ -127,6 +132,15 @@ const Movies = () => {
             onDelete={handleDelete}
             onSort={handleSort}
           />
+          {<ol>
+            {post.map((item) => (
+              <li key={item.id} className="mb-2">
+                <Link href={`/posts/${item.id}`} className="text-blue-600 hover:underline">
+                  {item.title}
+                </Link>
+              </li>
+            ))}
+          </ol>}
           <Pagination
             itemCount={totalCount}
             pageSize={pageSize}
