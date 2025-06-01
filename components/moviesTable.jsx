@@ -19,7 +19,7 @@ const MoviesTable = ({
       content: (movie) => (
         <Link
           href={`/movies/${movie._id}`}
-          className="text-blue-600 hover:underline font-medium sm:w-24 md:w-45 inline-block"
+          className="text-blue-600 hover:underline cursor-pointer"
         >
           {movie.title}
         </Link>
