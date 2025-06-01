@@ -30,7 +30,7 @@ const MoviesTable = ({
     { path: "dailyRentalRate", label: "Rate" },
     {
       key: "like",
-      content: (movie) => <Like liked={false} onLike={() => onLike(movie)} />,
+      content: (movie) => <Like liked={movie.liked} onLike={() => onLike(movie)} />,
     },
   ];
 

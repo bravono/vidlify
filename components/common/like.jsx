@@ -1,17 +1,18 @@
 "use client";
 
 import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons"; // Hollow version
 
 const Like = ({ onLike, liked }) => {
-  let classes = "fa fa-heart";
-  if (!liked) classes += "-o";
   return (
-    <i
+    <FontAwesomeIcon
+      icon={liked ? faHeart : faHeartRegular}
       onClick={onLike}
-      className={classes}
       style={{ cursor: "pointer" }}
       area-hidden="true"
-    ></i>
+    />
   );
 };
 

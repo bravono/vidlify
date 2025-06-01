@@ -35,7 +35,7 @@ const Movies = () => {
           );
           return uniqueGenres;
         });
-        setPost(postsRes.data)
+        setPost(postsRes.data);
       } catch (error) {
         toast.error("Failed to fetch movies or genres.");
       }
@@ -57,10 +57,9 @@ const Movies = () => {
   };
 
   const handleLike = (movie) => {
-    const updatedMovies = [...movies];
-    const index = updatedMovies.indexOf(movie);
-    updatedMovies[index] = { ...updatedMovies[index] };
-    updatedMovies[index].liked = !updatedMovies[index].liked;
+    const updatedMovies = movies.map((m) =>
+      m._id === movie._id ? { ...m, liked: !m.liked } : m
+    );
     setMovies(updatedMovies);
   };
 
@@ -130,7 +129,7 @@ const Movies = () => {
             onDelete={handleDelete}
             onSort={handleSort}
           />
-         
+
           <Pagination
             itemCount={totalCount}
             pageSize={pageSize}
