@@ -1,7 +1,10 @@
 import React from "react";
 import Link from "next/link";
+import { useAuth } from "../app/context/AuthContext";
 
-const NavBar = ({ user = "" }) => {
+const NavBar = () => {
+  const { user, logout } = useAuth();
+
   return (
     <nav className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between w-full">
       <Link href="/" className="text-xl font-bold text-blue-600">
@@ -53,6 +56,7 @@ const NavBar = ({ user = "" }) => {
             <Link
               href="/logout"
               className="text-gray-700 hover:text-blue-600 font-medium"
+              onClick={logout}
             >
               Logout
             </Link>
